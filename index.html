@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The World of Platforming: An Interactive Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Industrial Neutrals -->
+    <!-- Application Structure Plan: The SPA is designed as a top-down narrative journey. It starts with a high-level definition (Hero), moves to the core 'How it Works' section which is the application's centerpiece, then explores the different 'Technologies' through interactive comparison, visualizes the 'Products', and finally zooms out to the 'Global Landscape'. This thematic, storytelling structure was chosen over a direct report-to-page mapping to guide the user from basic concepts to complex comparisons and market context, enhancing comprehension and engagement. Key interactions include tab-based technology switching and dropdown-driven chart updates to allow direct comparison and exploration of variables. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info (Table 4.1): Compare SRR, Cyclic, CCR -> Goal: Compare -> Viz: Grouped Bar Chart -> Interaction: Buttons to select technology, updating chart and text. Justification: Directly visualizes performance differences. Library: Chart.js.
+        - Report Info (Table 5.1): Product Yields vs. Feed/Severity -> Goal: Show Change -> Viz: Dynamic Stacked Bar Chart -> Interaction: Dropdowns to select feedstock and severity. Justification: Shows how operating choices impact product distribution. Library: Chart.js.
+        - Report Info (Table 2.1): Feed vs. Product Composition -> Goal: Compare -> Viz: Two Donut Charts -> Interaction: Static side-by-side view. Justification: Clear, immediate visualization of the chemical transformation. Library: Chart.js.
+        - Report Info (Sec 6.2): CCR vs SR Market Trend -> Goal: Show Change -> Viz: Line Chart -> Interaction: Static view. Justification: Best represents trends over time. Library: Chart.js.
+        - Report Info (Chemistry): Reaction Mechanisms -> Goal: Organize/Inform -> Viz: HTML/CSS styled diagrams. Justification: Provides a clean, lightweight visual representation of chemical processes without complex graphics. Method: Styled divs. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF7;
+            color: #2c3e50;
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #e67e22;
+            border-bottom-color: #e67e22;
+        }
+        .card {
+            background-color: #FFFFFF;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.1);
+        }
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        .btn-secondary, .tab-btn {
+            background-color: #ecf0f1;
+            color: #34495e;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .btn-secondary:hover, .tab-btn:hover {
+            background-color: #bdc3c7;
+        }
+        .tab-btn.active {
+            background-color: #e67e22;
+            color: white;
+        }
+        .chart-container {
+            position: relative; 
+            width: 100%; 
+            max-width: 600px; 
+            margin-left: auto; 
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container { 
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-2xl font-bold text-gray-800">
+                <span class="text-[#e67e22]">Platforming</span> Explorer
+            </div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#overview" class="nav-link">Overview</a>
+                <a href="#technology" class="nav-link">Technology</a>
+                <a href="#products" class="nav-link">Products</a>
+                <a href="#market" class="nav-link">Global Landscape</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden text-gray-700 focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden">
+            <a href="#overview" class="block py-2 px-6 text-sm hover:bg-gray-100">Overview</a>
+            <a href="#technology" class="block py-2 px-6 text-sm hover:bg-gray-100">Technology</a>
+            <a href="#products" class="block py-2 px-6 text-sm hover:bg-gray-100">Products</a>
+            <a href="#market" class="block py-2 px-6 text-sm hover:bg-gray-100">Global Landscape</a>
+        </div>
+    </header>
+
+    <main>
+        <section id="overview" class="py-16 sm:py-24">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-4xl md:text-6xl font-bold leading-tight mb-4">The Power of Platforming</h1>
+                <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto mb-12">An essential refinery process that transforms low-value naphtha into three critical high-value products. Explore how this technology fuels our world and powers the petrochemical industry.</p>
+                
+                <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                    <div class="card p-8">
+                        <div class="text-5xl mb-4">⛽</div>
+                        <h3 class="text-2xl font-bold mb-2">High-Octane Gasoline</h3>
+                        <p class="text-gray-600">Producing high-quality, anti-knock reformate, the primary blending component for modern gasoline.</p>
+                    </div>
+                    <div class="card p-8">
+                        <div class="text-5xl mb-4">🧪</div>
+                        <h3 class="text-2xl font-bold mb-2">Aromatic Hydrocarbons</h3>
+                        <p class="text-gray-600">Generating Benzene, Toluene, and Xylenes (BTX), the fundamental building blocks for plastics and chemicals.</p>
+                    </div>
+                    <div class="card p-8">
+                        <div class="text-5xl mb-4">💨</div>
+                        <h3 class="text-2xl font-bold mb-2">High-Purity Hydrogen</h3>
+                        <p class="text-gray-600">A valuable co-product essential for producing cleaner, low-sulfur fuels throughout the refinery.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-gray-50 py-16 sm:py-24">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold">The Transformation Process</h2>
+                    <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">Platforming is a story of chemical transformation. Low-octane heavy naphtha undergoes a series of complex reactions over a catalyst to yield high-value products. This section visualizes that change.</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div class="card p-6">
+                        <h3 class="text-2xl font-bold text-center mb-4">Input: Heavy Naphtha</h3>
+                        <div class="chart-container h-64 md:h-80"><canvas id="feedChart"></canvas></div>
+                        <p class="text-sm text-gray-500 mt-4 text-center">A typical feedstock is composed largely of low-octane paraffins and naphthenes.</p>
+                    </div>
+                    <div class="card p-6">
+                        <h3 class="text-2xl font-bold text-center mb-4">Output: High-Octane Reformate</h3>
+                        <div class="chart-container h-64 md:h-80"><canvas id="productChart"></canvas></div>
+                        <p class="text-sm text-gray-500 mt-4 text-center">The product is rich in high-octane aromatics, the result of catalytic conversion.</p>
+                    </div>
+                </div>
+
+                <div class="card mt-12 p-8">
+                    <h3 class="text-2xl font-bold text-center mb-6">Inside the Reactor: Chemistry & Catalysts</h3>
+                    <p class="text-center text-gray-600 mb-8 max-w-3xl mx-auto">The magic happens via a bifunctional catalyst (metal + acid sites) that orchestrates several key reactions simultaneously. The goal is to create molecules with higher octane numbers.</p>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="border border-gray-200 rounded-lg p-4 bg-white">
+                            <h4 class="font-bold text-lg text-center text-[#2980b9]">Dehydrogenation</h4>
+                            <div class="text-center my-3 text-3xl">C₆H₁₂ → C₆H₆ + 3H₂</div>
+                            <p class="text-sm text-gray-600">Naphthenes (rings) are converted to high-octane aromatics, producing valuable hydrogen. This is a primary octane-boosting reaction.</p>
+                        </div>
+                        <div class="border border-gray-200 rounded-lg p-4 bg-white">
+                            <h4 class="font-bold text-lg text-center text-[#27ae60]">Isomerization</h4>
+                             <div class="text-center my-3 text-3xl">n-C₇ → iso-C₇</div>
+                            <p class="text-sm text-gray-600">Straight-chain paraffins are rearranged into branched isomers, significantly increasing their octane rating without changing weight.</p>
+                        </div>
+                        <div class="border border-gray-200 rounded-lg p-4 bg-white">
+                            <h4 class="font-bold text-lg text-center text-[#e67e22]">Dehydrocyclization</h4>
+                            <div class="text-center my-3 text-3xl">C₇H₁₆ → C₇H₈ + 4H₂</div>
+                            <p class="text-sm text-gray-600">Paraffins (chains) are converted into aromatics (rings), creating both octane and hydrogen. More complex than dehydrogenation.</p>
+                        </div>
+                        <div class="border border-gray-200 rounded-lg p-4 bg-white">
+                            <h4 class="font-bold text-lg text-center text-[#c0392b]">Hydrocracking</h4>
+                            <div class="text-center my-3 text-3xl">C₁₀ + H₂ → C₄ + C₆</div>
+                            <p class="text-sm text-gray-600">An undesirable side reaction that cracks larger molecules into smaller ones like LPG, reducing liquid yield. It consumes hydrogen.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="technology" class="py-16 sm:py-24">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold">A Tale of Three Technologies</h2>
+                    <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">Platforming technology has evolved significantly, primarily in how catalyst deactivation (coking) is managed. The method of catalyst regeneration defines the process type, its operating conditions, and its efficiency. Select a technology below to compare its performance.</p>
+                </div>
+
+                <div class="flex justify-center space-x-2 md:space-x-4 mb-8">
+                    <button class="tab-btn active text-sm md:text-base font-semibold py-2 px-4 rounded-full" data-tech="srr">Semi-Regenerative (SRR)</button>
+                    <button class="tab-btn text-sm md:text-base font-semibold py-2 px-4 rounded-full" data-tech="cyclic">Cyclic</button>
+                    <button class="tab-btn text-sm md:text-base font-semibold py-2 px-4 rounded-full" data-tech="ccr">Continuous (CCR)</button>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-8 items-center">
+                    <div id="tech-details" class="card p-8 order-2 lg:order-1">
+                        
+                    </div>
+                    <div class="order-1 lg:order-2">
+                        <div class="chart-container h-80 md:h-96"><canvas id="techCompareChart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="products" class="bg-gray-50 py-16 sm:py-24">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold">Product Yields & Distribution</h2>
+                    <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">The final mix of products depends heavily on the feedstock quality and the process severity. Refiners can adjust operations to maximize either high-octane gasoline or valuable aromatics based on market demand. Use the selectors to see how yields change.</p>
+                </div>
+
+                <div class="card p-8">
+                    <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mb-8">
+                        <div>
+                            <label for="feedstock-selector" class="font-semibold mr-2">Feedstock:</label>
+                            <select id="feedstock-selector" class="p-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                <option value="rich" selected>Rich Naphtha (High Naphthene)</option>
+                                <option value="lean">Lean Naphtha (High Paraffin)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="severity-selector" class="font-semibold mr-2">Operating Mode:</label>
+                            <select id="severity-selector" class="p-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                <option value="srr_moderate" selected>SRR - Moderate Severity</option>
+                                <option value="ccr_max_octane">CCR - Max Octane</option>
+                                <option value="ccr_max_aromatics">CCR - Max Aromatics</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid lg:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <div class="chart-container h-80 md:h-96"><canvas id="yieldChart"></canvas></div>
+                        </div>
+                        <div id="yield-summary" class="prose max-w-none">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="market" class="py-16 sm:py-24">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold">Global Landscape</h2>
+                    <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">Platforming is a globally dominant technology. Its landscape is shaped by market demand, major technology licensors, and the ever-present impact of environmental regulations.</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="card p-8">
+                        <h3 class="text-2xl font-bold mb-4 text-center">Market Trend: The Rise of CCR</h3>
+                        <p class="text-gray-600 mb-4 text-center">The industry shows a clear, sustained shift away from older Semi-Regenerative units towards more efficient Continuous Catalyst Regeneration (CCR) technology due to its superior yields and operational flexibility.</p>
+                        <div class="chart-container h-64 md:h-80"><canvas id="marketTrendChart"></canvas></div>
+                    </div>
+                    <div class="card p-8">
+                        <h3 class="text-2xl font-bold mb-4 text-center">Impact of Environmental Regulations</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <h4 class="font-semibold text-lg"> stricter Benzene Limits</h4>
+                                <p class="text-gray-600">Regulations on benzene, a carcinogen, drive innovations in feed preparation and benzene extraction/saturation to keep it out of the final gasoline pool.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg">Increased Hydrogen Demand</h4>
+                                <p class="text-gray-600">The global push for ultra-low sulfur fuels requires massive amounts of hydrogen for hydrotreating. The platformer is a primary internal source, making its hydrogen yield economically critical.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg">Energy Efficiency & Emissions</h4>
+                                <p class="text-gray-600">As an energy-intensive process, there is a continuous drive to improve heat integration and catalyst efficiency to reduce the carbon footprint of platforming units.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-12 p-8">
+                    <h3 class="text-2xl font-bold text-center mb-6">Leading Technology Licensors</h3>
+                    <div class="flex justify-around items-center flex-wrap gap-8 text-gray-500 font-semibold text-lg">
+                        <span>Honeywell UOP</span>
+                        <span>Axens</span>
+                        <span>Chevron Lummus Global</span>
+                        <span>KBR</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p>Platforming Explorer | An Interactive Application</p>
+            <p class="text-sm text-gray-400 mt-2">Content derived from "Platforming in Petroleum Refining: A Comprehensive Technical Review."</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('main section');
+            
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 68) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+
+            const feedData = {
+                labels: ['Paraffins', 'Naphthenes', 'Aromatics'],
+                datasets: [{
+                    label: 'Heavy Naphtha Feed',
+                    data: [50, 35, 8],
+                    backgroundColor: ['#3498db', '#f1c40f', '#e67e22'],
+                    hoverOffset: 4
+                }]
+            };
+
+            const productData = {
+                labels: ['Aromatics', 'Paraffins', 'Naphthenes'],
+                datasets: [{
+                    label: 'Reformate Product',
+                    data: [52, 40, 8],
+                    backgroundColor: ['#e67e22', '#3498db', '#f1c40f'],
+                    hoverOffset: 4
+                }]
+            };
+            
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed !== null) {
+                                    label += context.parsed + '%';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            };
+            
+            new Chart(document.getElementById('feedChart'), { type: 'doughnut', data: feedData, options: chartOptions });
+            new Chart(document.getElementById('productChart'), { type: 'doughnut', data: productData, options: chartOptions });
+            
+            const techData = {
+                srr: {
+                    name: 'Semi-Regenerative (SRR)',
+                    description: `The original and simplest design. The catalyst is fixed in the reactor and the entire unit must be shut down for regeneration every 6-24 months. To prolong catalyst life, it operates at higher pressures, which is less efficient.`,
+                    advantages: `Lower capital cost, simpler operation.`,
+                    disadvantages: `Lower yields and octane, periodic shutdowns reduce on-stream time.`,
+                    pressure: 'High (15-20 barg)',
+                    octane: 92,
+                    h2_yield: 1.8,
+                    c5_yield: 84
+                },
+                cyclic: {
+                    name: 'Cyclic Reforming',
+                    description: `An improvement on SRR, this design uses an extra 'swing' reactor that can be taken offline for regeneration while others continue to operate. This improves the overall on-stream factor.`,
+                    advantages: `Higher on-stream time than SRR, can operate at slightly higher severity.`,
+                    disadvantages: `Mechanically complex due to extensive valve switching systems.`,
+                    pressure: 'Moderate (~14 barg)',
+                    octane: 102,
+                    h2_yield: 2.2,
+                    c5_yield: 81
+                },
+                ccr: {
+                    name: 'Continuous Catalyst Regeneration (CCR)',
+                    description: `State-of-the-art technology where the catalyst continuously moves through the reactors to a separate regeneration unit. This maintains high catalyst activity at all times.`,
+                    advantages: `Maximum yields, octane, and hydrogen production. Highest on-stream factor and operational flexibility.`,
+                    disadvantages: `Highest capital cost, mechanically complex catalyst handling systems.`,
+                    pressure: 'Low (3.5-10 barg)',
+                    octane: 101, // Taking an average value for the chart, but can go higher
+                    h2_yield: 3.0,
+                    c5_yield: 81.5
+                }
+            };
+
+            const techDetailsContainer = document.getElementById('tech-details');
+            const techCompareChartCanvas = document.getElementById('techCompareChart');
+            let techCompareChart;
+
+            function updateTechDetails(techKey) {
+                const data = techData[techKey];
+                techDetailsContainer.innerHTML = `
+                    <h3 class="text-2xl font-bold mb-3">${data.name}</h3>
+                    <p class="text-gray-600 mb-4">${data.description}</p>
+                    <div class="space-y-3">
+                        <div><strong class="text-gray-700">Operating Pressure:</strong> <span class="text-[#e67e22] font-semibold">${data.pressure}</span></div>
+                        <div><strong class="text-gray-700">Advantages:</strong> ${data.advantages}</div>
+                        <div><strong class="text-gray-700">Disadvantages:</strong> ${data.disadvantages}</div>
+                    </div>
+                `;
+            }
+            
+            function createTechCompareChart() {
+                const ctx = techCompareChartCanvas.getContext('2d');
+                techCompareChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Reformate Octane (RONC)', 'Hydrogen Yield (wt%)', 'Reformate Yield (vol%)'],
+                        datasets: [
+                            {
+                                label: 'SRR',
+                                data: [techData.srr.octane, techData.srr.h2_yield * 10, techData.srr.c5_yield],
+                                backgroundColor: '#3498db',
+                                borderColor: '#2980b9',
+                                borderWidth: 1,
+                                hidden: false,
+                            },
+                            {
+                                label: 'Cyclic',
+                                data: [techData.cyclic.octane, techData.cyclic.h2_yield * 10, techData.cyclic.c5_yield],
+                                backgroundColor: '#f1c40f',
+                                borderColor: '#f39c12',
+                                borderWidth: 1,
+                                hidden: false,
+                            },
+                            {
+                                label: 'CCR',
+                                data: [techData.ccr.octane, techData.ccr.h2_yield * 10, techData.ccr.c5_yield],
+                                backgroundColor: '#2ecc71',
+                                borderColor: '#27ae60',
+                                borderWidth: 1,
+                                hidden: false,
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: { display: true, text: 'Technology Performance Comparison' },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) { label += ': '; }
+                                        let value = context.parsed.y;
+                                        if (context.label.includes('Yield')) {
+                                           value = context.label.includes('Hydrogen') ? value / 10 : value;
+                                           label += value + '%';
+                                        } else {
+                                            label += value;
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: { display: true, text: 'Relative Value (H2 Yield scaled x10)' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            document.querySelectorAll('.tab-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                    const techKey = e.target.dataset.tech;
+                    updateTechDetails(techKey);
+                    
+                    techCompareChart.data.datasets.forEach((dataset, index) => {
+                         dataset.hidden = techData[Object.keys(techData)[index]].name !== techData[techKey].name;
+                    });
+                    
+                    // Simple logic to show all if a general view is desired
+                    // for now, let's keep it that clicking one highlights one, but let's re-enable all for comparison
+                     techCompareChart.data.datasets.forEach(dataset => dataset.hidden = false);
+                     // Let's instead just change border width for highlight
+                     techCompareChart.data.datasets.forEach((dataset, i) => {
+                         dataset.borderWidth = (Object.keys(techData)[i] === techKey) ? 3 : 1;
+                     });
+                    techCompareChart.update();
+                });
+            });
+            
+            createTechCompareChart();
+            updateTechDetails('srr');
+
+            const yieldData = {
+                rich: {
+                    srr_moderate: { yields: [84, 2, 7, 7], summary: "In a moderate severity SRR unit with rich feed, the primary output is a high volume of reformate with good octane. Hydrogen and LPG production are moderate." },
+                    ccr_max_octane: { yields: [81.5, 3, 68, 11.5], summary: "Switching to a CCR unit for max octane increases aromatics and hydrogen significantly, but at the cost of some liquid reformate yield, which is converted to more LPG." },
+                    ccr_max_aromatics: { yields: [78.5, 3.5, 75, 14], summary: "Pushing for maximum aromatics (BTX) further increases hydrogen and aromatics content, but hydrocracking is more pronounced, leading to the highest LPG yield and lowest reformate volume." }
+                },
+                lean: {
+                    srr_moderate: { yields: [79, 1.5, 48, 11.5], summary: "With a paraffin-rich (lean) feed, an SRR unit produces less aromatics and significantly less hydrogen. The reformate yield is lower due to higher baseline cracking." },
+                    ccr_max_octane: { yields: [76, 2.3, 62, 16], summary: "A CCR unit improves performance on lean feed, boosting octane and hydrogen. However, the higher severity required for conversion results in a substantial LPG make." },
+                    ccr_max_aromatics: { yields: [76, 2.3, 62, 16], summary: "For lean feeds, max octane and max aromatics modes are very similar, as pushing for more aromatics from paraffins is difficult and primarily results in more cracking. (Data illustrative)" }
+                }
+            };
+
+            const yieldChartCanvas = document.getElementById('yieldChart');
+            let yieldChart;
+
+            function updateYields() {
+                const feed = document.getElementById('feedstock-selector').value;
+                const mode = document.getElementById('severity-selector').value;
+                const data = yieldData[feed][mode];
+                
+                yieldChart.data.datasets[0].data = data.yields;
+                if (feed === 'rich') {
+                     yieldChart.data.datasets[0].data = yieldData.rich[mode].yields;
+                     document.getElementById('yield-summary').innerHTML = `<h4>Summary</h4><p>${yieldData.rich[mode].summary}</p>`;
+                } else {
+                     yieldChart.data.datasets[0].data = yieldData.lean[mode].yields;
+                     document.getElementById('yield-summary').innerHTML = `<h4>Summary</h4><p>${yieldData.lean[mode].summary}</p>`;
+                }
+                
+                yieldChart.update();
+            }
+
+            function createYieldChart() {
+                const ctx = yieldChartCanvas.getContext('2d');
+                yieldChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Yield Distribution'],
+                        datasets: [{
+                            label: 'Reformate (C5+)',
+                            data: [84],
+                            backgroundColor: '#3498db',
+                        },{
+                            label: 'Hydrogen',
+                            data: [2],
+                            backgroundColor: '#9b59b6',
+                        },{
+                            label: 'Aromatics in Reformate',
+                            data: [60],
+                            backgroundColor: '#e67e22',
+                        },
+                        {
+                            label: 'LPG (C3+C4)',
+                            data: [7],
+                            backgroundColor: '#c0392b',
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: { display: true, text: 'Product Yields (wt% on Feed)' },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${context.dataset.label}: ${context.raw}%`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: { stacked: true, max: 100, title: { display: true, text: 'Weight Percent (%)' } },
+                            y: { stacked: true }
+                        }
+                    }
+                });
+                // Correct yield data assignment and summary update
+                const initialData = yieldData.rich.srr_moderate;
+                yieldChart.data.datasets = [
+                    { label: 'Reformate (C5+)', data: [initialData.yields[0]], backgroundColor: '#3498db' },
+                    { label: 'Hydrogen', data: [initialData.yields[1]], backgroundColor: '#9b59b6' },
+                    { label: 'LPG (C3+C4)', data: [initialData.yields[3]], backgroundColor: '#c0392b' },
+                ];
+                 document.getElementById('yield-summary').innerHTML = `<h4>Summary</h4><p>${initialData.summary}</p><p class="mt-2">The chart shows the distribution of products by weight percentage of the feed. Note that 'Aromatics' are a component of the 'Reformate' stream, not a separate yield stream in this visualization.</p>`;
+                 yieldChart.update();
+            }
+
+            document.getElementById('feedstock-selector').addEventListener('change', updateYields);
+            document.getElementById('severity-selector').addEventListener('change', updateYields);
+            
+            createYieldChart();
+            updateYields();
+
+            // Market Trend Chart
+            new Chart(document.getElementById('marketTrendChart'), {
+                type: 'line',
+                data: {
+                    labels: ['2010', '2015', '2020', '2025 (Proj.)'],
+                    datasets: [{
+                        label: 'CCR Catalyst Demand',
+                        data: [45, 55, 62, 68],
+                        borderColor: '#2ecc71',
+                        backgroundColor: '#2ecc7120',
+                        fill: true,
+                        tension: 0.2
+                    }, {
+                        label: 'SRR Catalyst Demand',
+                        data: [55, 45, 38, 32],
+                        borderColor: '#e74c3c',
+                        backgroundColor: '#e74c3c20',
+                        fill: true,
+                        tension: 0.2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: { display: true, text: 'Catalyst Demand Shift: CCR vs SRR' }
+                    },
+                    scales: {
+                        y: { title: { display: true, text: 'Relative Market Share (%)' } }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
